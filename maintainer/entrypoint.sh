@@ -16,9 +16,9 @@ export ANTHROPIC_BASE_URL="https://api.kimi.com/coding/"
 export ANTHROPIC_API_KEY="${KIMI_API_KEY}"
 export DISABLE_COST_WARNINGS=true
 
-# --- Telegram config ---
-export TELEGRAM_BOT_TOKEN="8519990240:AAFdkKtwMES_LGm4YyloMeAm-x5uWey6GCA"
-export TELEGRAM_CHAT_ID="2045995148"
+# --- Telegram config (from env, set in .env / docker-compose) ---
+: "${TELEGRAM_BOT_TOKEN:?TELEGRAM_BOT_TOKEN is required}"
+: "${TELEGRAM_CHAT_ID:?TELEGRAM_CHAT_ID is required}"
 
 # --- Claude Code config (isolated, API key auth) ---
 export CLAUDE_CONFIG_DIR="/workspace/.claude-config"
