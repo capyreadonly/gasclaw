@@ -170,3 +170,52 @@ class TestGasclawConfig:
         )
         assert cfg.gt_rig_url == "/project"
         assert cfg.gt_agent_count == 6
+
+class TestConfigValidation:
+    """Tests for config validation in __post_init__."""
+
+    def test_telegram_owner_id_must_be_numeric(self, monkeypatch):
+        """TELEGRAM_OWNER_ID must be a numeric string."""
+        monkeypatch.setenv("GASTOWN_KIMI_KEYS", "sk-key1")
+        monkeypatch.setenv("OPENCLAW_KIMI_KEY", "sk-key2")
+        monkeypatch.setenv("TELEGRAM_BOT_TOKEN", "token")
+        monkeypatch.setenv("TELEGRAM_OWNER_ID", "not_numeric")
+
+        with pytest.raises(ValueError, match="TELEGRAM_OWNER_ID must be numeric"):
+            load_config()
+
+    def test_telegram_owner_id_numeric_is_valid(self, monkeypatch):
+        """Numeric TELEGRAM_OWNER_ID is accepted."""
+        monkeypatch.setenv("GASTOWN_KIMI_KEYS", "sk-key1")
+        monkeypatch.setenv("OPENCLAW_KIMI_KEY", "sk-key2")
+        monkeypatch.setenv("TELEGRAM_BOT_TOKEN", "token")
+        monkeypatch.setenv("TELEGRAM_OWNER_ID", "123456789")
+
+        config = load_config()
+        assert config.telegram_owner_id == "123456789"
+
+    def test_project_dir_relative_path_warning(self, monkeypatch, caplog):
+        """Relative PROJECT_DIR generates warning."""
+        monkeypatch.setenv("GASTOWN_KIMI_KEYS", "sk-key1")
+        monkeypatch.setenv("OPENCLAW_KIMI_KEY", "sk-key2")
+        monkeypatch.setenv("TELEGRAM_BOT_TOKEN", "token")
+        monkeypatch.setenv("TELEGRAM_OWNER_ID", "123456")
+        monkeypatch.setenv("PROJECT_DIR", "relative/path")
+
+        with caplog.at_level(logging.WARNING):
+            load_config()
+
+        assert "should be an absolute path" in caplog.text
+
+    def test_gt_rig_url_invalid_warning(self, monkeypatch, caplog):
+        """Invalid GT_RIG_URL generates warning."""
+        monkeypatch.setenv("GASTOWN_KIMI_KEYS", "sk-key1")
+        monkeypatch.setenv("OPENCLAW_KIMI_KEY", "sk-key2")
+        monkeypatch.setenv("TELEGRAM_BOT_TOKEN", "token")
+        monkeypatch.setenv("TELEGRAM_OWNER_ID", "123456")
+        monkeypatch.setenv("GT_RIG_URL", "invalid::url")
+
+        with caplog.at_level(logging.WARNING):
+            load_config()
+
+        assert "should be a path or URL" in caplog.text
