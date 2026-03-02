@@ -18,6 +18,10 @@ RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
 # Claude Code
 RUN npm install -g @anthropic-ai/claude-code
 
+# Non-root user (Claude Code refuses --dangerously-skip-permissions as root)
+RUN useradd -m -s /bin/bash maintainer \
+    && mkdir -p /workspace && chown maintainer:maintainer /workspace
+
 # Working directory
 WORKDIR /workspace
 
@@ -25,4 +29,5 @@ WORKDIR /workspace
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
+USER maintainer
 ENTRYPOINT ["/entrypoint.sh"]
