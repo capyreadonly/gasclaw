@@ -1,8 +1,10 @@
-FROM node:22-slim
+FROM python:3.13-slim-bookworm
 
-# System deps
+# System deps + Node.js 22
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl git tmux python3 python3-pip python3-venv ca-certificates gnupg jq \
+    curl git tmux ca-certificates gnupg jq \
+    && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/*
 
 # GitHub CLI
