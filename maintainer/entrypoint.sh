@@ -58,30 +58,29 @@ python -m pytest tests/unit -v
 # --- Launch Claude Code as maintainer ---
 echo ""
 echo "Starting Claude Code maintainer loop..."
-exec claude --dangerously-skip-permissions \
-  -p "$(cat <<'PROMPT'
-You are the gasclaw repo maintainer. Read CLAUDE.md first.
+
+MAINTAINER_PROMPT='You are the gasclaw repo maintainer. Read CLAUDE.md first.
 
 Your continuous maintenance loop:
 
-1. **Check issues**: `gh issue list --repo gastown-publish/gasclaw --state open`
-2. **Check PRs**: `gh pr list --repo gastown-publish/gasclaw`
-3. **Review open PRs**: For each PR, review code quality, run tests, approve or request changes
-4. **Fix open issues**: Branch, implement with tests, create PR
-5. **Improve test coverage**: Find untested paths, add edge case tests
-6. **Code quality**: Run `make lint`, fix issues, improve types/error handling
-7. **Report issues**: If you find bugs you can't fix in one PR, file an issue
+1. Check issues: gh issue list --repo gastown-publish/gasclaw --state open
+2. Check PRs: gh pr list --repo gastown-publish/gasclaw
+3. Review open PRs: For each PR, review code quality, run tests, approve or request changes
+4. Fix open issues: Branch, implement with tests, create PR
+5. Improve test coverage: Find untested paths, add edge case tests
+6. Code quality: Run make lint, fix issues, improve types/error handling
+7. Report issues: If you find bugs you cannot fix in one PR, file an issue
 
 After completing each task, move to the next. When all tasks done, look for improvements.
 
 Rules:
-- Always branch from latest main: `git checkout main && git pull`
+- Always branch from latest main: git checkout main and git pull
 - Branch naming: fix/, feat/, test/, docs/, refactor/
-- Run `make test` before every commit
-- One concern per PR, keep PRs small (<200 lines)
-- Never push to main directly — always use PRs
+- Run make test before every commit
+- One concern per PR, keep PRs small (under 200 lines)
+- Never push to main directly, always use PRs
 - Write tests first (TDD)
 
-Start now. Begin by reading CLAUDE.md, then check issues and PRs.
-PROMPT
-)'
+Start now. Begin by reading CLAUDE.md, then check issues and PRs.'
+
+exec claude --dangerously-skip-permissions -p "$MAINTAINER_PROMPT"
