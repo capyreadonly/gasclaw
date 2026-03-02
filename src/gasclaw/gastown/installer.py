@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+import logging
 import subprocess
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 import tomlkit
 
@@ -69,8 +72,7 @@ def gastown_install(*, gt_root: Path, rig_url: str) -> None:
     subprocess.run(
         ["gt", "install", str(gt_root), "--git"],
         check=True,
+        timeout=30,
     )
     subprocess.run(
-        ["gt", "rig", "add", "project", rig_url],
-        check=True,
-    )
+   
