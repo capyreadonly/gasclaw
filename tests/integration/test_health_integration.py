@@ -9,10 +9,6 @@ from __future__ import annotations
 import subprocess
 from unittest.mock import MagicMock, patch
 
-import pytest
-import respx
-from httpx import Response
-
 from gasclaw.health import HealthReport, check_agent_activity, check_health
 
 

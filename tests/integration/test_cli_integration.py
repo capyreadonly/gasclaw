@@ -5,7 +5,7 @@ These tests verify CLI commands work correctly with mocked dependencies.
 
 from __future__ import annotations
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
 import respx
@@ -361,4 +361,5 @@ class TestCLIErrorHandling:
         result = runner.invoke(app, ["start", "--gt-root", str(custom_path)])
         
         assert result.exit_code == 0
-        assert len(ca
+        assert len(captured_gt_root) == 1
+        assert captured_gt_root[0] == custom_path

@@ -35,7 +35,6 @@ class TestSetupKimiAccounts:
 
     def test_empty_keys_list_creates_no_accounts(self, tmp_path):
         """Empty keys list should not create any account directories."""
-        from pathlib import Path
         setup_kimi_accounts([], accounts_dir=tmp_path)
         # No subdirectories should be created
         assert list(tmp_path.iterdir()) == []

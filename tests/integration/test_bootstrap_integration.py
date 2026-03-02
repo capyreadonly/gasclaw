@@ -7,7 +7,6 @@ with mocked external dependencies (HTTP APIs, subprocess calls).
 from __future__ import annotations
 
 import subprocess
-from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
