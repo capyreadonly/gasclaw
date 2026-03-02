@@ -23,8 +23,13 @@ def write_openclaw_config(
     bot_token: str,
     owner_id: str,
     gateway_port: int = 18789,
+    gt_root: str = "/workspace/gt",
 ) -> Path:
     """Write ~/.openclaw/openclaw.json with full configuration.
+
+    Uses beads (bd) for memory/state instead of file-based memory.
+    The workspace points to the Gastown rig's .beads directory so
+    OpenClaw tracks all state through Dolt-backed beads.
 
     Args:
         openclaw_dir: Path to the openclaw config directory.
@@ -32,6 +37,7 @@ def write_openclaw_config(
         bot_token: Telegram bot token.
         owner_id: Telegram user ID for allowlist.
         gateway_port: Gateway port (default 18789).
+        gt_root: Gastown root directory (for bead workspace).
 
     Returns:
         Path to the written openclaw.json.
@@ -69,6 +75,14 @@ def write_openclaw_config(
                         "name": "Gasclaw Overseer",
                         "emoji": "🏭",
                     },
+                    "instructions": (
+                        "You use beads (bd CLI) for ALL memory and state tracking. "
+                        "Never use plain markdown memory files. "
+                        "Use 'bd create' to record tasks, decisions, and state. "
+                        "Use 'bd list' and 'bd search' to recall past context. "
+                        "Use 'bd close' when tasks are done. "
+                        "Beads are backed by Dolt SQL and survive restarts."
+                    ),
                 }
             ],
         },
@@ -94,6 +108,11 @@ def write_openclaw_config(
                 "token": auth_token,
             },
         },
+        "plugins": {
+            "slots": {
+                "memory": "none",
+            },
+        },
         "tools": {
             "exec": {
                 "security": "full",
@@ -101,6 +120,7 @@ def write_openclaw_config(
         },
         "env": {
             "MOONSHOT_API_KEY": kimi_key,
+            "BD_ROOT": gt_root,
         },
     }
 

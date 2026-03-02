@@ -184,7 +184,6 @@ class TestWriteOpenclawConfig:
         """New token generated when existing config is corrupted."""
         config_path = tmp_path / "openclaw.json"
         config_path.write_text("not valid json!")
-
         write_openclaw_config(
             openclaw_dir=tmp_path,
             kimi_key="sk-test",
@@ -194,3 +193,38 @@ class TestWriteOpenclawConfig:
         cfg = json.loads(config_path.read_text())
         token = cfg["gateway"]["auth"]["token"]
         assert len(token) == 64  # New valid token generated
+
+    def test_memory_plugin_disabled(self, tmp_path):
+        """File-based memory plugin is disabled in favor of beads."""
+        write_openclaw_config(
+            openclaw_dir=tmp_path,
+            kimi_key="sk-test",
+            bot_token="123:ABC",
+            owner_id="999",
+        )
+        cfg = json.loads((tmp_path / "openclaw.json").read_text())
+        assert cfg["plugins"]["slots"]["memory"] == "none"
+
+    def test_bd_root_in_env(self, tmp_path):
+        """BD_ROOT env var is set for bead integration."""
+        write_openclaw_config(
+            openclaw_dir=tmp_path,
+            kimi_key="sk-test",
+            bot_token="123:ABC",
+            owner_id="999",
+            gt_root="/workspace/gt",
+        )
+        cfg = json.loads((tmp_path / "openclaw.json").read_text())
+        assert cfg["env"]["BD_ROOT"] == "/workspace/gt"
+
+    def test_agent_instructions_mention_beads(self, tmp_path):
+        """Agent instructions tell OpenClaw to use beads, not files."""
+        write_openclaw_config(
+            openclaw_dir=tmp_path,
+            kimi_key="sk-test",
+            bot_token="123:ABC",
+            owner_id="999",
+        )
+        cfg = json.loads((tmp_path / "openclaw.json").read_text())
+        agent = cfg["agents"]["list"][0]
+        assert "bd" in agent["instructions"].lower() or "bead" in agent["instructions"].lower()

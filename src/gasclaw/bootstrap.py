@@ -73,7 +73,7 @@ def bootstrap(config: GasclawConfig, *, gt_root: Path = Path("/workspace/gt")) -
         dolt_started = True
         logger.info("Dolt started successfully")
 
-        # 5. Configure OpenClaw
+        # 5. Configure OpenClaw (beads for memory, not files)
         openclaw_dir = Path.home() / ".openclaw"
         logger.info("Configuring OpenClaw in %s", openclaw_dir)
         write_openclaw_config(
@@ -81,6 +81,7 @@ def bootstrap(config: GasclawConfig, *, gt_root: Path = Path("/workspace/gt")) -
             kimi_key=config.openclaw_kimi_key,
             bot_token=config.telegram_bot_token,
             owner_id=config.telegram_owner_id,
+            gt_root=str(gt_root),
         )
 
         # 6. Install skills
