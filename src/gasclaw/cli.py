@@ -2,15 +2,13 @@
 
 from __future__ import annotations
 
-import logging
 from pathlib import Path
 
 import typer
-
-logger = logging.getLogger(__name__)
 from rich.console import Console
 from rich.table import Table
 
+from gasclaw import __version__
 from gasclaw.bootstrap import bootstrap, monitor_loop
 from gasclaw.config import load_config
 from gasclaw.gastown.lifecycle import stop_all
@@ -19,8 +17,29 @@ from gasclaw.kimigas.key_pool import KeyPool
 from gasclaw.updater.applier import apply_updates
 from gasclaw.updater.checker import check_versions
 
+
+def version_callback(value: bool) -> None:
+    """Print version and exit."""
+    if value:
+        console.print(f"gasclaw {__version__}")
+        raise typer.Exit()
+
+
 app = typer.Typer(help="Gasclaw — Gastown + OpenClaw + KimiGas in one container.")
 console = Console()
+
+
+@app.callback()
+def main(
+    version: bool | None = typer.Option(
+        None, "--version",
+        callback=version_callback,
+        is_eager=True,
+        help="Show version and exit.",
+    ),
+) -> None:
+    """Gasclaw CLI."""
+    pass
 
 
 @app.command()
@@ -64,7 +83,7 @@ def status() -> None:
         report.key_pool = pool.status()
     except ValueError:
         # Config not loaded, skip optional fields
-        logger.debug("Config not loaded, skipping optional status fields")
+        pass
 
     table = Table(title="Gasclaw Status")
     table.add_column("Service", style="bold")
@@ -100,4 +119,11 @@ def update() -> None:
     console.print("\n[bold]Applying updates...[/bold]")
     results = apply_updates()
     for name, result in results.items():
-        st
+        style = "green" if result == "updated" else "yellow"
+        console.print(f"  {name}: [{style}]{result}[/{style}]")
+
+
+@app.command()
+def version() -> None:
+    """Show gasclaw version."""
+    console.print(f"gasclaw {__version__}")

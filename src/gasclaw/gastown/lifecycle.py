@@ -2,11 +2,8 @@
 
 from __future__ import annotations
 
-import logging
 import subprocess
 import time
-
-logger = logging.getLogger(__name__)
 
 __all__ = ["start_dolt", "start_daemon", "start_mayor", "stop_all"]
 
@@ -44,7 +41,6 @@ def start_dolt(
         result = subprocess.run(
             ["dolt", "sql", "--port", str(port), "-q", "SELECT 1"],
             capture_output=True,
-            timeout=30,
         )
         if result.returncode == 0:
             return
@@ -54,7 +50,7 @@ def start_dolt(
 
 def start_daemon() -> None:
     """Start the Gastown daemon."""
-    subprocess.run(["gt", "daemon", "start"], check=True, timeout=30)
+    subprocess.run(["gt", "daemon", "start"], check=True)
 
 
 def start_mayor(*, agent: str = "kimi-claude") -> None:
@@ -66,11 +62,15 @@ def start_mayor(*, agent: str = "kimi-claude") -> None:
     subprocess.run(
         ["gt", "mayor", "start", "--agent", agent],
         check=True,
-        timeout=30,
     )
 
 
 def stop_all() -> None:
     """Stop all Gastown services (mayor, daemon, dolt)."""
-    subprocess.run(["gt", "mayor", "stop"], check=False, timeout=30)
-   
+    try:
+        subprocess.run(["gt", "mayor", "stop"], check=False)
+        subprocess.run(["gt", "daemon", "stop"], check=False)
+        subprocess.run(["dolt", "sql-server", "--stop"], check=False)
+    except FileNotFoundError:
+        # Binaries not installed - services likely not running
+        pass
