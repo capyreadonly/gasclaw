@@ -47,15 +47,41 @@ tg_send() {
 echo "Configuring OpenClaw..."
 OPENCLAW_DIR="$HOME/.openclaw"
 mkdir -p "$OPENCLAW_DIR"
+mkdir -p "$OPENCLAW_DIR/agents/main/agent"
+
+# Write custom provider models.json (Kimi K2.5 via api.kimi.com/coding/)
+cat > "$OPENCLAW_DIR/agents/main/agent/models.json" <<MJSON
+{
+  "providers": {
+    "kimi-coding": {
+      "baseUrl": "https://api.kimi.com/coding/",
+      "api": "anthropic-messages",
+      "models": [
+        {
+          "id": "k2p5",
+          "name": "Kimi for Coding",
+          "reasoning": true,
+          "input": ["text", "image"],
+          "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 },
+          "contextWindow": 262144,
+          "maxTokens": 32768
+        }
+      ],
+      "apiKey": "${KIMI_API_KEY}"
+    }
+  }
+}
+MJSON
+
 cat > "$OPENCLAW_DIR/openclaw.json" <<OCJSON
 {
   "agents": {
     "defaults": {
       "model": {
-        "primary": "openrouter/moonshotai/kimi-k2.5"
+        "primary": "kimi-coding/k2p5"
       },
       "models": {
-        "openrouter/moonshotai/kimi-k2.5": {}
+        "kimi-coding/k2p5": {}
       }
     },
     "list": [
@@ -95,7 +121,7 @@ cat > "$OPENCLAW_DIR/openclaw.json" <<OCJSON
     }
   },
   "env": {
-    "MOONSHOT_API_KEY": "${KIMI_API_KEY}"
+    "KIMI_API_KEY": "${KIMI_API_KEY}"
   }
 }
 OCJSON
