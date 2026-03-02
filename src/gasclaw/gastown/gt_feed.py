@@ -234,9 +234,8 @@ def format_feed_for_telegram(
         lines.append("🕐 *Recent Activity:*")
         for event in events:
             emoji = "📝" if event["type"] == "commit" else "🔀"
-            desc = event["description"][:50]
-            if len(event["description"]) > 50:
-                desc += "..."
+            full_desc = event["description"]
+            desc = full_desc[:50] + ("..." if len(full_desc) > 50 else "")
             actor = event["actor"][:15]
             lines.append(f"  {emoji} {desc} — _{actor}_")
     else:

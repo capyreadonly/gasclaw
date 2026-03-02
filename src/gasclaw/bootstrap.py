@@ -190,4 +190,3 @@ def monitor_loop(
             time.sleep(interval)
     except KeyboardInterrupt:
         logger.info("Monitor loop stopped by user")
-        pass
