@@ -8,24 +8,11 @@ Gastown + OpenClaw + KimiGas in one container. A single-container deployment tha
 
 ## Architecture
 
-```
-┌─────────────────────── Docker Container ───────────────────────┐
-│                                                                 │
-│  OpenClaw Gateway (port 18789) — THE OVERSEER                  │
-│    ├── Telegram channel → human                                │
-│    ├── Kimi K2.5 (own key pool, separate from Gastown)         │
-│    └── Skills: health, keys, update, agents                    │
-│                                                                 │
-│  Gastown HQ (/workspace/gt)                                    │
-│    ├── Mayor (Claude Code via KimiGas)                         │
-│    ├── Deacon, Witness, Refinery                               │
-│    ├── Crew (6-8 workers)                                      │
-│    ├── Dolt SQL (port 3307)                                    │
-│    └── Key rotation pool (separate from OpenClaw)              │
-│                                                                 │
-│  /project ← volume mount from host                             │
-└─────────────────────────────────────────────────────────────────┘
-```
+![Gasclaw Architecture](docs/assets/gasclaw-architecture.png)
+
+**Key Principle**: Gastown runs **INSIDE** the container, not outside. This is a single-container deployment.
+
+
 
 ## Quick Start
 
